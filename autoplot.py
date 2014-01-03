@@ -54,24 +54,40 @@ def loadData(commands):
             multipleDataContainer += loadData(commands)
         return multipleDataContainer
 
-def plotData(commands, dataContainer):
+def plotData(commands,dataContainer):
     plotType = commands["plot_type"]
     plotCLKwargs = eval(commands["plot_kwargs"])
     if plotType=="line":
-        for i,dataFile in enumerate(dataContainer):
+        for j, dataFile in enumerate(dataContainer):
+            filePath = "./"
+            if "/" in commands['data']:
+                filePath = re.findall("^(.*[\\\/])",commands['data'])[0]
+            fname = "%sfile%d_fig"%(filePath,j)
             xData = dataFile[commands["x_data"]]
             dataFile.pop(commands["x_data"])
-            for j,dataSet in enumerate(dataFile):
+            for i,dataSet in enumerate(dataFile):
+                multiIndex=""
+                if len(dataFile) > 2:
+                    multiIndex = "_%02d"%i
                 w, h = plt.figaspect(commands['aspect'])
                 fig = plt.figure(figsize=(w,h))
                 plt.plot(xData,dataSet,**plotCLKwargs)
                 plt.xlabel(commands['xlabel'])
                 plt.ylabel(commands['ylabel'])
                 plt.title(commands['title'])
-                plt.savefig("%03d_%03d_%s"%(i,j,commands['fname']))
+                plt.savefig("%s%s"%(fname,multiIndex))
     return 0
 
+def progBar(percent):
+    prefix = ' %3d%%'%(percent)
+    progress = int(percent/2)
+    bar_size = 50
+    remain = bar_size - progress
+    bar = '|' * progress + ' ' * remain
+    return prefix + ' [' + bar + ']'
+
 def main():
+    global commands
     if len(sys.argv) < 2:
         jobPath = "autoplotlist.txt"
     else: 
@@ -87,7 +103,6 @@ def main():
     with open(jobPath,"r") as jobFile:
         for lineNum,line in enumerate(jobFile):
             commands = { 
-                "fname": "unnamed_fig_%d.png"%lineNum,
                 "data": None,
                 "data_type": "CSV",
                 "dpi": 100,
@@ -108,9 +123,11 @@ def main():
             if commands["data"] is not None:
                 loadedData = loadData(commands)
                 plotData(commands,loadedData)
-                print "Finished figure %d/%d."%(lineNum+1,numJobs)
+                sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*15 +'\r')
+                sys.stdout.flush()
             elif commands["data"] is None:
-                print "Error: Data missing from %s on line %d; failed to generate figure."%(jobPath,lineNum+1)
-
+                continue
+    print "\n Finished."
+    return 0
 if __name__ == "__main__":
     main()
