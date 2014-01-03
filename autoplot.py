@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from __future__ import division
 import numpy as np
 import matplotlib
@@ -46,8 +47,9 @@ def loadData(commands):
         singleDataContainer = [[np.array(dataColumn) for dataColumn in columnContainer]]
         return singleDataContainer
     else:
+        filePath = commands['data']
         multipleDataContainer = []
-        for fileName in glob.iglob("testdata/*.%s"%(commands['data_type'])):
+        for fileName in glob.iglob("%s/*.%s"%(filePath,commands['data_type'])):
             commands['data'] = fileName
             multipleDataContainer += loadData(commands)
         return multipleDataContainer
@@ -60,12 +62,13 @@ def plotData(commands, dataContainer):
             xData = dataFile[commands["x_data"]]
             dataFile.pop(commands["x_data"])
             for j,dataSet in enumerate(dataFile):
-                plt.figure()
+                w, h = plt.figaspect(commands['aspect'])
+                fig = plt.figure(figsize=(w,h))
                 plt.plot(xData,dataSet,**plotCLKwargs)
                 plt.xlabel(commands['xlabel'])
                 plt.ylabel(commands['ylabel'])
                 plt.title(commands['title'])
-                plt.savefig("%03d_%03d_%s"%(i,j,commands["fname"]))
+                plt.savefig("%03d_%03d_%s"%(i,j,commands['fname']))
     return 0
 
 def main():
@@ -95,7 +98,8 @@ def main():
                 "ylabel": "label your y axis!",
                 "title": "",
                 "scope": 0,
-                "animate": 0
+                "animate": 0,
+                "aspect": .35
                 }
             if "#" in line:
                 line = re.findall("^(.*?)(?=\s#|#)",line)[0]
