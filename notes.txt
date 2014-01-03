@@ -1,0 +1,35 @@
+options:
+
+fname: The file name of and desired path to the figure being generated. Automatically numbered (incase multiple figures being generated).
+
+data: the location of the data for the plot(s). filename or path to directory with files in in. default type it looks for is .CSV. can be changed. example:
+      	     data="~/science/data/" data_type="csv"  
+
+plot_type: the type of matplotlib plot that will be generated. currently only line plot.
+
+plot_kwargs: input standard kwargs for each plot function as a python dict containing strings. example:
+	     plot_kwargs="{'color':'r', 'marker':'o'}
+
+xdata: specify the column to be on the horizontal axis for plots being generated from one CSV file (counting from zero). otherwise, defaults to the first column. example:
+       	     xdata=1
+
+axis_labels: Specify the axis labels for the figure. Example:
+	     x_label="Time (s)", y_label="Voltage (V)", title="RC filter signal."
+
+current defaults:
+
+            commands = { 
+                "fname": "unnamed_fig_%d.png"%lineNum,
+                "data": None,
+                "data_type": "CSV",
+                "dpi": 100,
+                "plot_type": "line",
+                "plot_kwargs": "{}",
+                "x_data": 0,
+                "xlabel": "label your x axis!",
+                "ylabel": "label your y axis!",
+                "title": "",
+                "scope": 0,
+                "animate": 0
+                }
+

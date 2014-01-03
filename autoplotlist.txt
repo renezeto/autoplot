@@ -1,0 +1,2 @@
+data="test_data.CSV" fname="testfig.png" plot_type="line" xlabel="Numbers" ylabel="And more numbers" title="Here are some plotted numbers." plot_kwargs="{'linestyle':'--', 'color':'y'}"
+data="testdata"
