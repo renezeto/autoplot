@@ -30,7 +30,9 @@ def setCommands(line):
         "yscale": "linear",
         "xscale_kwargs": "{}",
         "yscale_kwargs": "{}",
-        "theory": None
+        "theory": None,
+        "ticksize":25,
+        "labelsize":36
         }
     if "#" in line:
         line = re.findall("^(.*?)(?=\s#|#)",line)[0]
@@ -88,8 +90,9 @@ def plotData(commands,dataContainer):
             axs.plot(xData,curve,**plotCLKwargs)
         axs.set_xscale(commands['xscale'],**eval(commands['xscale_kwargs']))
         axs.set_yscale(commands['yscale'],**eval(commands['yscale_kwargs']))
-        plt.xlabel(commands['xlabel'])
-        plt.ylabel(commands['ylabel'])
+        plt.xlabel(commands['xlabel'],fontsize=commands['labelsize'])
+        plt.ylabel(commands['ylabel'],fontsize=commands['labelsize'])
+        axs.tick_params(axis='both', which='major', labelsize=commands['ticksize'])
         plt.title(commands['title'])
         x1, x2 = plt.xlim()
         y1, y2 = plt.ylim()
