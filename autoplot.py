@@ -10,34 +10,31 @@ import glob
 import re
 import decimal
 
-#setCommands() handles commands.
-#main() handles files.
-#loadData() handles data.
-#plotData() handles plots.
-
-#to do:
-#subplot management
-#xrange, yrange
-#prettier default plots
+matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+matplotlib.rc('text', usetex=True)
 
 def setCommands(line):
     commands = { 
         "data": None,
         "data_type": "CSV",
-        "dpi": 100,
         "plot_type": "line",
-        "plot_kwargs": "{}",
+        "plot_kwargs": "{'color':'r'}",
         "x_data": 0,
         "xlabel": "label your x axis!",
         "ylabel": "label your y axis!",
         "title": "",
-        "scope": 0,
-        "animate": 0,
-        "aspect": .35
+        "aspect": .35,
+        "xrange": None,
+        "yrange": None,
+        "xscale": "linear",
+        "yscale": "linear",
+        "xscale_kwargs": "{}",
+        "yscale_kwargs": "{}",
+        "theory": None
         }
     if "#" in line:
         line = re.findall("^(.*?)(?=\s#|#)",line)[0]
-    kwargs = re.findall("\w+=\"[()\w,.'=\s/{:}-]+\"",line)
+    kwargs = re.findall("\w+=\"[()\w,.'=\s*/{:}-]+\"",line)
     flags = re.findall("\-\w+",line)
     inputCommands = {}
     for kwarg in kwargs:
@@ -77,15 +74,32 @@ def plotData(commands,dataContainer):
     plotType = commands["plot_type"]
     plotCLKwargs = eval(commands["plot_kwargs"])
     if plotType=="line":
-        fig, axs = plt.subplots(1, 1)
+        w, h = plt.figaspect(commands['aspect'])
+        fig, axs = plt.subplots(1, 1,figsize=(w,h))
         fname = commands['data'][:-4]
         xData = dataContainer[commands["x_data"]]
         dataContainer.pop(commands["x_data"])
         for dataSet in dataContainer:
             axs.plot(xData,dataSet,**plotCLKwargs)
-            plt.xlabel(commands['xlabel'])
-            plt.ylabel(commands['ylabel'])
-            plt.title(commands['title'])
+        if commands["theory"] is not None:
+            expression=commands["theory"]
+            x = np.array([float(i) for i in xData])
+            curve = eval(expression)
+            axs.plot(xData,curve,**plotCLKwargs)
+        axs.set_xscale(commands['xscale'],**eval(commands['xscale_kwargs']))
+        axs.set_yscale(commands['yscale'],**eval(commands['yscale_kwargs']))
+        plt.xlabel(commands['xlabel'])
+        plt.ylabel(commands['ylabel'])
+        plt.title(commands['title'])
+        x1, x2 = plt.xlim()
+        y1, y2 = plt.ylim()
+        if commands['xrange'] is not None:
+            x1, x2 = eval(commands['xrange'])
+        if commands['yrange'] is not None:
+            y1, y2 = eval(commands['yrange'])
+        plt.xlim([x1,x2])
+        plt.ylim([y1,y2])
+        plt.tight_layout()
         plt.savefig("%s"%fname)
     return 0
 
