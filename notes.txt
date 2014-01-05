@@ -16,6 +16,10 @@ xdata: specify the column to be on the horizontal axis for plots being generated
 axis_labels: Specify the axis labels for the figure. Example:
 	     x_label="Time (s)", y_label="Voltage (V)", title="RC filter signal."
 
+plot features to implement:
+- legends
+- multiple data set plots
+
 current defaults:
 
             commands = { 
