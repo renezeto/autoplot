@@ -16,37 +16,45 @@ matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 # matplotlib.rc('text', usetex=True)
 
 def setCommands(line):
+    # Return a dictionary containing commands parsed from a line with entries of the form "parameter=argument" and "-flag".
+    
+    # default parameters
     commands = { 
-        "data": None,
-        "data_type": "CSV",
-        "plot_type": "line",
-        "plot_kwargs": "{'color':'r'}",
-        "x_data": 0,
-        "xlabel": "label your x axis!",
-        "ylabel": "label your y axis!",
-        "title": "",
-        "aspect": .35,
-        "xrange": None,
-        "yrange": None,
-        "xscale": "linear",
-        "yscale": "linear",
-        "xscale_kwargs": "{}",
-        "yscale_kwargs": "{}",
-        "theory": None,
-        "ticksize":25,
-        "labelsize":36
+        "data": None,                   # Path of CSV data file
+        "data_type": "CSV",             # Type of data file (Currently must be CSV)
+        "plot_type": "line",            # 
+        "plot_kwargs": "{'color':'r'}", #
+        "x_data": 0,                    #
+        "xlabel": "label your x axis!", #
+        "ylabel": "label your y axis!", #
+        "title": "",                    #
+        "aspect": .35,                  #
+        "xrange": None,                 #
+        "yrange": None,                 #
+        "xscale": "linear",             #
+        "yscale": "linear",             #
+        "xscale_kwargs": "{}",          #
+        "yscale_kwargs": "{}",          #
+        "theory": None,                 #
+        "ticksize":25,                  #
+        "labelsize":36                  #
         }
+    # Handle comments at the end of the line (marked with #)
     if "#" in line:
         line = re.findall("^(.*?)(?=\s#|#)",line)[0]
+
+    # Find all parameter="argument" keywords and -flag flags
     kwargs = re.findall("\w+=\"[\\\\()\w,.'=\s*/{:}-]+\"",line)
     flags = re.findall("\-\w+",line)
-    inputCommands = {}
+    
+    # Update kwargs and add flags commands
+    inputCommands = {}                       
     for kwarg in kwargs:
         key, value = tuple(kwarg.split("=",1))
-        value = value.replace("\"","")
+        value = value.replace("\"","") # Handle lines split with \
         inputCommands[key]=value
     for flag in flags:
-        key, value = flag.replace("-",""), 1
+        key, value = flag.replace("-",""), 1 # Remove - prefix, set value to 1  ## Why not use the handy boolean data type??
         inputCommands[key]=value
     commands.update(inputCommands)        
     return commands
@@ -59,7 +67,11 @@ def loadData(commands):
         iterNum = 0
         for line in dataFile:
             if re.search("[a-zA-Z]",line)!=None:
+                # Discard lines containing text
                 continue
+            ## Why is it necessary to deviate from built in python floats here? I'm not sure I understand what's going on here.
+            ## It seems like you are checking the number of entries in the row against the length of the dataContainer list and
+            ## filling it out with Nones.
             dataRow = [decimal.Decimal(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
             if len(dataRow) > len(dataContainer):
                 dataContainer += [[None for i in range(iterNum)] for j in range(len(dataRow))]
@@ -117,6 +129,7 @@ def progBar(percent):
     return prefix + ' [' + bar + ']'
             
 def main():
+
     # Check for valid file and get number of jobs
     if len(sys.argv) < 2:
         # User did not provide an input file, use default
@@ -133,7 +146,8 @@ def main():
     except:
         # Friendly error message for nonexistent file
         print "Error: Unable to open jobs file '%s'."%jobPath
-        return 1        
+        return 1
+        
     # Parse jobFile
     with open(jobPath,"r") as jobFile:
         for lineNum,line in enumerate(jobFile):
@@ -150,7 +164,8 @@ def main():
                         plotData(commands,loadedData)
                 sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*25 +'\r')
                 sys.stdout.flush()
-            elif commands["data"] is None:
+            #elif commands["data"] is None: # No need for another test
+            else:
                 continue
     print "\n Finished."
     return 0 
