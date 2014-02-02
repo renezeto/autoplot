@@ -1,0 +1,15 @@
+data="day1_lab8/ALL0000" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day1_lab8/ALL0001" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day1_lab8/ALL0002" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day1_lab8/ALL0003" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day1_lab8/ALL0004" xlabel="Time (s)" ylabel="Voltage (V)"
+
+data="day2_lab8/ALL0000" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day2_lab8/ALL0001" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day2_lab8/ALL0002" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day2_lab8/ALL0003" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day2_lab8/ALL0004" xlabel="Time (s)" ylabel="Voltage (V)"
+
+data="day3/ALL0005" xlabel="Time (s)" ylabel="Voltage (V)"
+data="day3/ALL0006" xlabel="Time (s)" ylabel="Voltage (V)" #I think this is our best one
+data="day3/ALL0007" xlabel="Time (s)" ylabel="Voltage (V)"

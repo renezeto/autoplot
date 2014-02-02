@@ -11,7 +11,7 @@ import re
 import decimal
 
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-matplotlib.rc('text', usetex=True)
+# matplotlib.rc('text', usetex=True)
 
 def setCommands(line):
     commands = { 
@@ -36,7 +36,7 @@ def setCommands(line):
         }
     if "#" in line:
         line = re.findall("^(.*?)(?=\s#|#)",line)[0]
-    kwargs = re.findall("\w+=\"[()\w,.'=\s*/{:}-]+\"",line)
+    kwargs = re.findall("\w+=\"[\\\\()\w,.'=\s*/{:}-]+\"",line)
     flags = re.findall("\-\w+",line)
     inputCommands = {}
     for kwarg in kwargs:
@@ -140,7 +140,7 @@ def main():
                         commands['data'] = fileName
                         loadedData = loadData(commands)
                         plotData(commands,loadedData)
-                sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*15 +'\r')
+                sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*25 +'\r')
                 sys.stdout.flush()
             elif commands["data"] is None:
                 continue

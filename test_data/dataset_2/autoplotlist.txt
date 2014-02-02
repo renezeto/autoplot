@@ -1,0 +1,14 @@
+data="data1.CSV" xlabel="Incident angle (degrees)" ylabel="Relative intensity" title="S-polarized light." plot_kwargs="{'marker':'o'}" aspect=".7" theory="np.abs((np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)-1.5*np.cos(x*np.pi/180))/(np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)+1.5*np.cos(x*np.pi/180)))**2" legend="['Relative intensity','Reflection coefficient']"
+
+data="data2.CSV" xlabel="Incident angle (degrees)" ylabel="Relative intensity" title="P-polarized light." plot_kwargs="{'marker':'o'}" aspect=".7" theory="np.abs((np.cos(x*np.pi/180)-1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2))/(np.cos(x*np.pi/180)+1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)))**2" legend="['Relative intensity','Reflection coefficient']"
+
+data="data3.CSV" xlabel="Incident angle (degrees)" ylabel="Relative intensity" plot_kwargs="{'marker':'o'}" title="P-polarized light." aspect=".7" legend="['Relative intensity','Transmission coefficient']" theory="1 - np.abs((np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)-1.5*np.cos(x*np.pi/180))/(np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)+1.5*np.cos(x*np.pi/180)))**2"
+
+data="data4.CSV" xlabel="Incident angle (degrees)" ylabel="Relative intensity" title="S-polarized light." plot_kwargs="{'marker':'o'}" aspect=".7" theory="1 - np.abs((np.cos(x*np.pi/180)-1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2))/(np.cos(x*np.pi/180)+1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)))**2" legend="['Relative intensity','Transmission coefficient']"
+
+#data="dummydata.CSV" xlabel="whateveR" ylabel="lol" theory="np.abs((np.cos(x*np.pi/180)-1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2))/(np.cos(x*np.pi/180)+1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)))**2" xrange="(0,180)" yrange="(0,.1)"
+#one of them:
+#np.abs((np.cos(x*np.pi/180)-1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2))/(np.cos(x*np.pi/180)+1.5*np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)))**2
+
+#the other one:
+#np.abs((np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)-1.5*np.cos(x*np.pi/180))/(np.sqrt(1-(1/1.5*np.sin(x*np.pi/180))**2)+1.5*np.cos(x*np.pi/180)))**2
