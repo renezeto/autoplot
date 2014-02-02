@@ -8,15 +8,33 @@ import sys
 import os
 import glob
 import re
-import decimal
+#import decimal
 
 # Justin O'Neil: commenting code
+# Suggestions:
+#  * consider an Autoplot class
+#     - move functions into Autoplot class methods
+#     - make commands, dataContainer internal class data structures
+#     - let the hypothetical Autoplot class parse jobFiles on its own (this
+#       will simplify the main() program)
+#  * consider removing decimal.Decimal() in favor of built-in floats (rounding
+#    to binary representations should not pose a problem for plotting [unless
+#    this is actually a problem])
+#  * DocStrings!
+#  * Make progress bar prettier ([===   ] instead of [|||   ])
+#  * I very much dislike camelCase, but_to_each_their_own..
+# Changes:
+#  * replaced decimal.Decimal(i) with float(i) in loadData()
+#  * changed progress bar to ===
+#  * started main_new() to give a general idea of what Autoplot() might look like
+#  * more comments
 
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 # matplotlib.rc('text', usetex=True)
 
 def setCommands(line):
-    # Return a dictionary containing commands parsed from a line with entries of the form "parameter=argument" and "-flag".
+    # Return a dictionary containing commands parsed from a line with entries
+    # of the form "parameter=argument" and "-flag".
     
     # default parameters
     commands = { 
@@ -60,19 +78,23 @@ def setCommands(line):
     return commands
 
 def loadData(commands):
+    # loadData(dictionary) -> [array(column1), array(column2)]
     dataContainer = []
     numEntries = 0
     fileLoc = commands['data']
     with open(fileLoc) as dataFile:
         iterNum = 0
         for line in dataFile:
+            # Each line represents a data point
             if re.search("[a-zA-Z]",line)!=None:
                 # Discard lines containing text
                 continue
-            ## Why is it necessary to deviate from built in python floats here? I'm not sure I understand what's going on here.
-            ## It seems like you are checking the number of entries in the row against the length of the dataContainer list and
-            ## filling it out with Nones.
-            dataRow = [decimal.Decimal(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
+            ## Why is it necessary to deviate from built in python floats?
+            ## I'm not sure I understand what's going on here. It seems like
+            ## you are checking the number of entries in the row against the
+            ## length of the dataContainer list and filling it out with Nones.
+            #dataRow = [decimal.Decimal(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
+            dataRow = [float(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
             if len(dataRow) > len(dataContainer):
                 dataContainer += [[None for i in range(iterNum)] for j in range(len(dataRow))]
                 numEntries = len(dataRow)
@@ -86,6 +108,7 @@ def loadData(commands):
     dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
     return dataContainer
     
+# TODO: learn how matplotlib works (jwo)
 def plotData(commands,dataContainer):
     plotType = commands["plot_type"]
     plotCLKwargs = eval(commands["plot_kwargs"])
@@ -121,15 +144,16 @@ def plotData(commands,dataContainer):
     return 0
 
 def progBar(percent):
+    # Create a progress bar showing percent completion.
+    # progBar(int) -> string
     prefix = ' %3d%%'%(percent)
     progress = int(percent/2)
     bar_size = 50
     remain = bar_size - progress
-    bar = '|' * progress + ' ' * remain
+    bar = '=' * progress + ' ' * remain
     return prefix + ' [' + bar + ']'
             
 def main():
-
     # Check for valid file and get number of jobs
     if len(sys.argv) < 2:
         # User did not provide an input file, use default
@@ -146,8 +170,7 @@ def main():
     except:
         # Friendly error message for nonexistent file
         print "Error: Unable to open jobs file '%s'."%jobPath
-        return 1
-        
+        return 1        
     # Parse jobFile
     with open(jobPath,"r") as jobFile:
         for lineNum,line in enumerate(jobFile):
@@ -164,11 +187,39 @@ def main():
                         plotData(commands,loadedData)
                 sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*25 +'\r')
                 sys.stdout.flush()
-            #elif commands["data"] is None: # No need for another test
+            #elif commands["data"] is None:     ## No need for another test
             else:
                 continue
     print "\n Finished."
     return 0 
+
+# Need to implement more things before making this main()
+## TODO: Implement Autoplot() class    
+def main_new():
+    if len(sys.argv) < 2:
+        # User did not provide an input file, use default
+        jobPath = "autoplotlist.txt"
+    else: 
+        # Use file provided on command line
+        ## TODO: change working directory to location of jobPath
+        jobPath = sys.argv[1]
+    # Open jobFile and give it to Autoplot()
+    try:
+        jobFile = open(jobPath, 'r')
+    except:
+        # Friendly error message for nonexistent file
+        print "Error: Unable to open jobs file '%s'."%jobPath
+        return 1
+    autoplot = Autoplot(jobFile)
+    # Create plots as long as autoplot has moreJobs
+    while autoplot.moreJobs:
+        autoplot.setCommands()
+        autoplot.loadData()
+        autoplot.plot()
+        autoplot.progress()
+    print "\n Finished."
+    jobFile.close()
+    return 0
 
 if __name__ == "__main__":
     main()
