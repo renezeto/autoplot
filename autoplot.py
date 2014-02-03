@@ -14,8 +14,6 @@ import re
 # While nothing is expected to break until I make it break, it is safer to
 # keep this out of the deployable branch.
 
-# Rene: Merged with my testing branch. If you are reading this, you have successfully pulled from my testing branch.
-
 # Justin O'Neil: commenting code
 # Suggestions:
 #  * consider an Autoplot class
@@ -75,8 +73,7 @@ class Autoplot():
         "legend": None,
         "legloc": "best"
         }
-    
-    def __init__(self, jobPath):
+x    def __init__(self, jobPath):
         self.commands = Autoplot.defaultCommands
         self.dataContainer = []
         self.countJobs(jobPath)
