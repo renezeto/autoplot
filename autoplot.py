@@ -18,7 +18,7 @@ def setCommands(line):
         "data": None,
         "data_type": "CSV",
         "plot_type": "line",
-        "plot_kwargs": "{'color':'r'}",
+        "plot_kwargs": "{}",
         "x_data": 0,
         "xlabel": "label your x axis!",
         "ylabel": "label your y axis!",
@@ -32,11 +32,13 @@ def setCommands(line):
         "yscale_kwargs": "{}",
         "theory": None,
         "ticksize":25,
-        "labelsize":36
+        "labelsize":36,
+        "legend": None,
+        "legloc":"best"
         }
     if "#" in line:
         line = re.findall("^(.*?)(?=\s#|#)",line)[0]
-    kwargs = re.findall("\w+=\"[()\w,.'=\s*/{:}-]+\"",line)
+    kwargs = re.findall("\w+=\"[()\w\[\],.+'=\s*/{:}-]+\"",line)
     flags = re.findall("\-\w+",line)
     inputCommands = {}
     for kwarg in kwargs:
@@ -93,9 +95,12 @@ def plotData(commands,dataContainer):
         plt.xlabel(commands['xlabel'],fontsize=commands['labelsize'])
         plt.ylabel(commands['ylabel'],fontsize=commands['labelsize'])
         axs.tick_params(axis='both', which='major', labelsize=commands['ticksize'])
-        plt.title(commands['title'])
+        plt.title(commands['title'],fontsize=commands['labelsize'])
+        if commands['legend'] is not None:
+            plt.legend(eval(commands['legend']),commands['legloc'])
         x1, x2 = plt.xlim()
         y1, y2 = plt.ylim()
+        axs.grid(True)
         if commands['xrange'] is not None:
             x1, x2 = eval(commands['xrange'])
         if commands['yrange'] is not None:
