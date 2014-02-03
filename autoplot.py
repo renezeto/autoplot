@@ -10,8 +10,10 @@ import glob
 import re
 import decimal
 
+# Justin O'Neil: commenting code
+
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-matplotlib.rc('text', usetex=True)
+# matplotlib.rc('text', usetex=True)
 
 def setCommands(line):
     commands = { 
@@ -120,18 +122,24 @@ def progBar(percent):
     return prefix + ' [' + bar + ']'
             
 def main():
+    # Check for valid file and get number of jobs
     if len(sys.argv) < 2:
+        # User did not provide an input file, use default
         jobPath = "autoplotlist.txt"
     else: 
+        # Use file provided on command line
         jobPath = sys.argv[1]
     try:
+        # Count the number of lines (jobs) in the file, add 1 b/c CS likes to start counting at 0
         with open(jobPath,"r") as jobFile:
             for numJobs, line in enumerate(jobFile):
                 pass
         numJobs += 1
     except:
+        # Friendly error message for nonexistent file
         print "Error: Unable to open jobs file '%s'."%jobPath
-        return 1
+        return 1        
+    # Parse jobFile
     with open(jobPath,"r") as jobFile:
         for lineNum,line in enumerate(jobFile):
             commands = setCommands(line)
@@ -145,12 +153,12 @@ def main():
                         commands['data'] = fileName
                         loadedData = loadData(commands)
                         plotData(commands,loadedData)
-                sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*15 +'\r')
+                sys.stdout.write(' Working: '+ progBar(((lineNum+1)/numJobs)*100)+' '+ commands['data'] + ' '*25 +'\r')
                 sys.stdout.flush()
             elif commands["data"] is None:
                 continue
     print "\n Finished."
-    return 0
+    return 0 
 
 if __name__ == "__main__":
     main()

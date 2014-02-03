@@ -1,0 +1,27 @@
+lab 8 notes-
+don't use anything marked (not good).
+part 1: 
+- part a: used R1 = 100 kOhm, R2 = 100 kOhm pot (measured value of 44.2 kOhm).
+- Vcc+ = 8 V. 
+- part b: screenshot: 00. Va = 10 Vpp ramp wave from fn generator, Vb = Vcc+. (not good)
+- part b: screenshot: 01. Va = 10 Vpp ramp wave from fn generator, Vb = Vcc+. (more rampy)
+- part c: screenshot: 02. Va = 10 Vpp ramp wave from fn generator, noise on (10%), Vb = Vcc+. (not good)
+- part c: screenshot: 03. Va = 10 Vpp ramp wave from fn generator, modulation 50 kHz, 10% depth, Vb = Vcc+. 
+- part c: screenshot: 04. Va = 10 Vpp ramp wave from fn generator, modulation 10 kHz, 10% depth, Vb = Vcc+.
+
+part 2:
+- part a: used potentiometer of 25kOhm as R3. Vcc = +- 8V.
+- part b: screenshot: 00. Va = 10 Vpp ramp wave from fn generator, no modulation. f = 1kHz.
+- part c: screenshot: 01. Va = 10 Vpp ramp wave from fn generator, no modulation. f = 1kHz. Changed R3=22.7 kOhm. used symmetric sawtooth wave.
+- part c: screenshot: 02. Va = 10 Vpp ramp wave from fn generator, no modulation. f = 1kHz. Changed R3=1.7 kOhm. used symmetric sawtooth wave.
+- part c: screenshot: 03. Va = 10 Vpp ramp wave from fn generator, no modulation. f = 1kHz. Changed R3=5.7 kOhm. used symmetric sawtooth wave.
+- part d: screenshot: 04. 
+- - wave was smaller with modulation, changed R2=10 Ohm, which lowered our reference voltage for the comparator. 
+
+part 3:
+- connected temperature sensor to ground with 1kOhm resistor.
+- want 313 mV/K from temperature sensor, so R2 = 30 Ohm, R1 = 928.4 Ohm
+- - used R2 = 30 Ohm, R1 = 910 Ohm. gives us 319 mV.
+- - used R3 = 130 kOhm.
+- - V(high) = 317 mV, v(low) = 320.55 mV. saw successful switch.
+
