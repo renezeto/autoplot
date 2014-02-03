@@ -29,6 +29,13 @@ import re
 #  * started main_new() to give a general idea of what Autoplot() might look like
 #  * more comments
 
+# Rene Zeto: 
+# * remove decimal implementation
+# * remove none filling (was there to support the odd case of missing data, but better to just throw an error)
+# * font implementation
+# * commit testing system (let's make sure it works before we commit!)
+# * would like to move default commands dict to a config file. 
+
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 # matplotlib.rc('text', usetex=True)
 
@@ -39,7 +46,7 @@ def setCommands(line):
     # default parameters
     commands = { 
         "data": None,                   # Path of CSV data file
-        "data_type": "CSV",             # Type of data file (Currently must be CSV)
+        "data_type": "CSV",             # Type of data file (Currently must be CSV) #rz: as in "character"-sv. other delimiters are fine.
         "plot_type": "line",            # 
         "plot_kwargs": "{'color':'r'}", #
         "x_data": 0,                    #
@@ -55,7 +62,7 @@ def setCommands(line):
         "yscale_kwargs": "{}",          #
         "theory": None,                 #
         "ticksize":25,                  #
-        "labelsize":36                  #
+        "labelsize":36,                 #
         "legend": None,
         "legloc":"best"
         }
@@ -73,13 +80,15 @@ def setCommands(line):
         value = value.replace("\"","") # Handle lines split with \
         inputCommands[key]=value
     for flag in flags:
-        key, value = flag.replace("-",""), 1 # Remove - prefix, set value to 1  ## Why not use the handy boolean data type??
+        key, value = flag.replace("-",""), 1 # Remove - prefix, set value to 1  ## Why not use the handy boolean data type?? #don't see an advantage. already using 1/0.
         inputCommands[key]=value
     commands.update(inputCommands)        
     return commands
 
 def loadData(commands):
-    # loadData(dictionary) -> [array(column1), array(column2)]
+    # loadData(dictionary) -> [array(column1), array(column2), array(column3), ..., array(columnN)] 
+    # RZ: format is [X, Y1, Y2, Y3]... eventually creates a plot with X vs Y_n for each n. usually n=1.
+    # this is because the CSV might have multiple columns, not just two. plotData then plots them on the same plot. (might want to change that later)
     dataContainer = []
     numEntries = 0
     fileLoc = commands['data']
@@ -90,22 +99,17 @@ def loadData(commands):
             if re.search("[a-zA-Z]",line)!=None:
                 # Discard lines containing text
                 continue
-            ## Why is it necessary to deviate from built in python floats?
-            ## I'm not sure I understand what's going on here. It seems like
-            ## you are checking the number of entries in the row against the
-            ## length of the dataContainer list and filling it out with Nones.
-            #dataRow = [decimal.Decimal(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
             dataRow = [float(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
-            if len(dataRow) > len(dataContainer):
-                dataContainer += [[None for i in range(iterNum)] for j in range(len(dataRow))]
-                numEntries = len(dataRow)
-            for i in range(numEntries):
+            # Create a column in dataContainer for each entry in dataRow 
+            if iterNum==0:
+                dataContainer = [[] for col in dataRow]
+            for i in range(len(dataRow)):
                 try:
                     dataContainer[i] += [dataRow[i]]
                 except IndexError:
-                    dataContainer[i] += [None]
-                    print "Warning: Missing data in column %d, data row %d. None placed at missing entry position."%(i+1,iterNum+1)
-                iterNum += 1
+                    print "Index error at column %d, row %d"%(i+1,iterNum+1)
+            iterNum += 1
+    # Convert to numpy arrays
     dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
     return dataContainer
     
@@ -185,6 +189,7 @@ def main():
                     plotData(commands,loadedData)
                 else:
                     filePath = commands['data']
+                    # Handles directory batch plotting (occurs when data kwarg is a directory and not a file)
                     for fileName in glob.iglob("%s/*.%s"%(filePath,commands['data_type'])):
                         commands['data'] = fileName
                         loadedData = loadData(commands)
