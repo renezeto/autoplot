@@ -1,0 +1,2 @@
+Things to keep - 
+ * preserve data="directory/path/containing/data" as method for plotting all data files within data/ with the same jobfile config

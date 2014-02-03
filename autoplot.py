@@ -8,7 +8,6 @@ import sys
 import os
 import glob
 import re
-#import decimal
 
 # Justin O'Neil: commenting code
 # Suggestions:
@@ -108,6 +107,7 @@ def loadData(commands):
                     dataContainer[i] += [dataRow[i]]
                 except IndexError:
                     print "Index error at column %d, row %d"%(i+1,iterNum+1)
+                    exit(1)
             iterNum += 1
     # Convert to numpy arrays
     dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
