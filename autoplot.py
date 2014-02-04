@@ -224,10 +224,17 @@ def main():
     # give jobPath to autoplot and make it work its magic
     ## TODO: Handle case where jobPath points to a nonexistent file
     ## TODO: Handle case where the data file for the job is missing
-    if not os.path.exists(jobPath):
-        
-    autoplot = Autoplot(jobPath)
-    autoplot.processJobs()
+    try:
+        autoplot = Autoplot(jobPath)
+    except IOError:
+        print "Missing job file. %s does not exist!"%jobPath
+        return 1
+    try:
+        autoplot.processJobs()
+    except IOError:
+        # Make this error message more descriptive
+        print "One or more data files are missing."
+        return 1
     print "\n Finished."
     return 0
 
