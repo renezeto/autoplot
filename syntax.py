@@ -14,32 +14,25 @@ import re
     # * this would be useful for e.g. multiple theory plots. 
     # * theory=[x^2, x^3, x^4]...
 
-
-class Token():
-    # [,]
-    # =
-    # . =
-    # " "
-    # -
-    pass
-
+# Breaks apart the line into expressions which can be evaluated.
 def scanner(line):
-    # Breaks apart the line into expressions which can be evaluated.
-    line = line.split(" ")
-    arg_container = [word for word in line]
-    for arg in arg_container:
-        # Quote groups
-        re.findall("\w+",arg)
-    return arg_container
+    # Parse out EOL comments
+    if ("#" in line): line = re.findall("^(.*?)(?=\s#|#)",line)[0]
+    # Find flags
+    flag_container = re.findall("-[\w]+",line)
+    # Find string valued kwargs
+    quote_kwarg_container = re.findall("([\w.]+=\"[^\"]*\")",line)
+    # Find list valued kwargs
+    group_kwarg_container = re.findall("\w+=\[[\w,\^*+-/! ()]+\]",line)
+    # Find alphanumeric valued kwargs
+    kwarg_container = re.findall("\w+=\w+",line)
+    # Append to list for evaluater.
+    return flag_container + quote_kwarg_container + group_kwarg_container + kwarg_container
 
-def evaluater():
+def translator(line):
     # Evaluates the expressions from scanner and returns the necessary information
     # to autoplot.
     pass
 
-def main():
-    # Debug function when running the module directly.
-    pass
-
 if __name__ == "__main__":
-    scanner("This is a dog.")
+    print scanner("This is a theory=[x^2, sin(x)] -flag -dog cat-yellow contourf.linecolor=yellow pcolor.marker=\"o -\" dog=blue 5=6 dang=\"sho ot\". \"hello sir\"")
