@@ -9,13 +9,6 @@ import os
 import glob
 import re
 
-# DO NOT MERGE THIS FILE!
-# The implimentation here is EXPERIMENTAL and INCOMPLETE
-# While nothing is expected to break until I make it break, it is safer to
-# keep this out of the deployable branch.
-
-# Rene: Merged with my testing branch. If you are reading this, you have successfully pulled from my testing branch.
-
 # Justin O'Neil: commenting code
 # Suggestions:
 #  * consider an Autoplot class
@@ -268,6 +261,7 @@ def loadData(commands):
                     dataContainer[i] += [dataRow[i]]
                 except IndexError:
                     print "Index error at column %d, row %d"%(i+1,iterNum+1)
+                    exit(1)
             iterNum += 1
     # Convert to numpy arrays
     dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
