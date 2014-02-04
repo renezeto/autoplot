@@ -16,9 +16,9 @@ import re
 
 # Justin O'Neil: commenting code, reimplimenting program logic to use OOP
 # Suggestions/TODO:
+#  * matplotlib complains about unclosed figures for larger sets of data. Fix this
 #  * Make progress bar work
 #  * Keyword argument library
-#  * Handle missing files gracefully
 #  * Extend IOError exception class to MissingJobs and MissingData exception classes
 #    so we can handle these problems in the main program
 #  * DocStrings!
@@ -37,6 +37,7 @@ import re
 #  * Renamed main_new() to main()
 #  * Refuse to run Plot.plotData() method if data has not been loaded (raises Exception)
 #     - Pick a more specific Exception type class
+#  * Handle case of missing files
 #  Notes:
 #   * return values for methods have been retained but are unused
 #   * 
@@ -140,7 +141,7 @@ class Autoplot():
 # a Plot object represents a single plotting job
 class Plot():
     def __init__(self, commands):
-        self.commands = commands
+        self.commands = commands.copy()
         self.dataContainer = None
  
     def loadData(self):
@@ -222,8 +223,6 @@ def main():
         ## TODO: change working directory to location of jobPath
         jobPath = sys.argv[1]
     # give jobPath to autoplot and make it work its magic
-    ## TODO: Handle case where jobPath points to a nonexistent file
-    ## TODO: Handle case where the data file for the job is missing
     try:
         autoplot = Autoplot(jobPath)
     except IOError:
