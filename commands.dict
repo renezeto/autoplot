@@ -1,0 +1,20 @@
+"data": None
+"data_type": "CSV"
+"plot_type": "line"
+"plot_kwargs": "{'color':'r'}"
+"x_data": 0
+"xlabel": "label your x axis!"
+"ylabel": "label your y axis!"
+"title": ""
+"aspect": .35
+"xrange": None
+"yrange": None
+"xscale": "linear"
+"yscale": "linear"
+"xscale_kwargs": "{}"
+"yscale_kwargs": "{}"
+"theory": None
+"ticksize":25
+"labelsize":36
+"legend": None
+"legloc": "best"
