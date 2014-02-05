@@ -9,6 +9,7 @@ import os
 import glob
 import re
 
+#
 # DO NOT MERGE THIS FILE!
 # The implimentation here is EXPERIMENTAL and INCOMPLETE
 # While nothing is expected to break until I make it break, it is safer to
@@ -81,7 +82,6 @@ class Autoplot():
         "legloc": "best"
         }
     
-<<<<<<< HEAD
     def __init__(self, jobPath):
         """Take a path to an autoplot job file and create a list of Plot objects for each job. Returns None."""
         ## Load defaults from config file here, e.g.,
@@ -131,49 +131,7 @@ class Autoplot():
             inputCommands[key]=value
         commands.update(inputCommands)
         return commands
-=======
-    # Update kwargs and add flags commands
-    inputCommands = {}                       
-    for kwarg in kwargs:
-        key, value = tuple(kwarg.split("=",1))
-        value = value.replace("\"","") # Handle lines split with \
-        inputCommands[key]=value
-    for flag in flags:
-        key, value = flag.replace("-",""), 1 # Remove - prefix, set value to 1  ## Why not use the handy boolean data type?? #don't see an advantage. already using 1/0.
-        inputCommands[key]=value
-    commands.update(inputCommands)        
-    return commands
 
-def loadData(commands):
-    # loadData(dictionary) -> [array(column1), array(column2), array(column3), ..., array(columnN)] 
-    # RZ: format is [X, Y1, Y2, Y3]... eventually creates a plot with X vs Y_n for each n. usually n=1.
-    # this is because the CSV might have multiple columns, not just two. plotData then plots them on the same plot. (might want to change that later)
-    dataContainer = []
-    numEntries = 0
-    fileLoc = commands['data']
-    with open(fileLoc) as dataFile:
-        iterNum = 0
-        for line in dataFile:
-            # Each line represents a data point
-            if re.search("[a-zA-Z]",line)!=None:
-                # Discard lines containing text
-                continue
-            dataRow = [float(i) for i in re.findall(r"[-+]?\d*\.\d+|\d+",line)]
-            # Create a column in dataContainer for each entry in dataRow 
-            if iterNum==0:
-                dataContainer = [[] for col in dataRow]
-            for i in range(len(dataRow)):
-                try:
-                    dataContainer[i] += [dataRow[i]]
-                except IndexError:
-                    print "Index error at column %d, row %d"%(i+1,iterNum+1)
-                    exit(1)
-            iterNum += 1
-    # Convert to numpy arrays
-    dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
-    return dataContainer
->>>>>>> 0292b2256d94f70f896105c4ddfa1cf7027dba03
-    
     def processJobs(self):
         """Process the plots created when the Autoplot object was initialized."""
     # Process each Plot one at a time
