@@ -90,7 +90,7 @@ class Autoplot():
         with open(jobPath) as jobFile:
             numJobs = 0
             for line in jobFile:
-                commands = self.setKWArgs(line)
+                commands = self._setKWArgs(line)
                 if commands["data"] is not None:
                     if os.path.isdir(commands['data'])==False:
                         plots.append(Plot(commands))
