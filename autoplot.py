@@ -38,6 +38,8 @@ import re
 #  * Refuse to run Plot.plotData() method if data has not been loaded (raises Exception)
 #     - Pick a more specific Exception type class
 #  * Handle case of missing files
+#  * Fixed bug resulting in only one plot to be generated per directory of data
+#  * Added DocStrings to Autoplot and Plot methods
 #  Notes:
 #   * return values for methods have been retained but are unused
 #   * 
@@ -80,6 +82,7 @@ class Autoplot():
         }
     
     def __init__(self, jobPath):
+        """Take a path to an autoplot job file and create a list of Plot objects for each job. Returns None."""
         ## Load defaults from config file here, e.g.,
         # defaultCommands = loadDefaults()
         plots = []
@@ -106,7 +109,8 @@ class Autoplot():
         
     ## Deleted countJobs(), job done by __init__() now (jwo)
         
-    def setKWArgs(self, line):
+    def _setKWArgs(self, line):
+        """Private method. Given a line from an autoplot job file, return a dictionary containing its parameters."""
         # Return commands dictionary with entries read from line in jobFile and the defaults
         commands = self.defaultCommands.copy()
         if "#" in line:
@@ -128,6 +132,7 @@ class Autoplot():
         return commands
     
     def processJobs(self):
+        """Process the plots created when the Autoplot object was initialized."""
     # Process each Plot one at a time
     ## This logic should be enhanced later (e.g,. by processing plots in parallel).
         for plot in self.plots:
@@ -136,18 +141,21 @@ class Autoplot():
 
     # TODO: progress bar needs to be implemented differently
     def progBar(self):
+        """No-op. Will display a progress bar."""
         pass
 
 # a Plot object represents a single plotting job
 class Plot():
     def __init__(self, commands):
+        """Given a dictionary of commands, copy commands to the new Plot object and initialize the dataContainer to None"""
         self.commands = commands.copy()
         self.dataContainer = None
  
     def loadData(self):
-    # loadData(commands_dict) -> [array(column1), array(column2), array(column3), ..., array(columnN)] -> self.
-    # RZ: format is [X, Y1, Y2, Y3]... eventually creates a plot with X vs Y_n for each n. usually n=1.
-    # this is because the CSV might have multiple columns, not just two. plotData then plots them on the same plot. (might want to change that later)
+        """Load the data file specified in the objects command dictionary"""
+        # loadData(commands_dict) -> [array(column1), array(column2), array(column3), ..., array(columnN)] -> self.
+        # RZ: format is [X, Y1, Y2, Y3]... eventually creates a plot with X vs Y_n for each n. usually n=1.
+        # this is because the CSV might have multiple columns, not just two. plotData then plots them on the same plot. (might want to change that later)
         dataContainer = []
         numEntries = 0
         fileLoc = self.commands['data']
@@ -172,9 +180,10 @@ class Plot():
         dataContainer = [np.array(dataColumn) for dataColumn in dataContainer]
         self.dataContainer = dataContainer
         return dataContainer
-        
+
+    ## TODO: learn how matplotlib works (jwo)
     def plotData(self):
-    # TODO: learn how matplotlib works (jwo)
+        """Generate plot of data loaded from a datafile. Output to PNG image with the same name."""
         if self.dataContainer is None:
             # Somebody fucked up. Refuse to run this.
             raise Exception
@@ -215,6 +224,7 @@ class Plot():
         return 0
 
 def main():
+    """Generate an Autoplot object with default or command-line specified job file. Process it's jobs."""
     if len(sys.argv) < 2:
         # User did not provide an input file, use default
         jobPath = "autoplotlist.txt"
