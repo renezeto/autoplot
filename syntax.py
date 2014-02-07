@@ -36,42 +36,62 @@ import re
 
 
 class Job():
-    command_list = None #list of assignment=value
-
-    assignment = None
-    listblock = None
-    terminal = None
-    strblock = []
-
-    token_counter = 0
 
     def __init__(self, line):
-        self.original_string = line
-        self.working_string = [line]
-        self.list_index = list(enumerate(line))
+        self.command_list = None #list of assignment=value
 
-    def token(value,token_type):
-        identifier = "@!APID:%05d!@"%token_counter
-        token_counter += 1
+        self.assignment = None
+
+        # Hash tables for stringblock, terminal, and listblock token types.
+        self.stringblock_catalog = {}
+        self.terminal_catalog = {}
+        self.listblock_catalog = {}
+
+        # If we are ever unsure of what type an identifier is, check its first index
+        # value in type_container.
+        self.type_container = [self.stringblock_catalog, self.terminal_catalog, self.listblock_catalog]
+
+        self.original_string = line
+        self.working_string = line
+
+        # This value increments each time a token is recorded.
+        self.token_counter = 0
+
+    def add_token(self,value,token_type):
+        identifier = "@!APID:%08d!@"%self.token_counter
+        if token_type == 0:
+            self.stringblock_catalog[identifier] = value
+        if token_type == 1:
+            self.terminal_catalog[identifier] = value
+        if token_type == 2:
+            self.listblock_catalog[identifier] = value
+        self.token_counter += 1
         return identifier
 
 def scanner(line):
     job = Job(line)
-    #find all stringblocks
-    stringblocks = re.findall("\"(.*?)\"",line)
-    for stringblock in stringblocks:
-        for substring in working_string:
-            substring = substring.replace(stringblock,job.token(stringblock))
-
+    print job.working_string
+    while re.search("\"(.*?)\"",job.working_string) is not None:
+        stringblock = re.search("\"(.*?)\"",job.working_string)
+        identifier = job.add_token(stringblock.group(0), 0)
+        matchstart = stringblock.start()
+        matchend = stringblock.end()
+        job.working_string = job.working_string[:matchstart] + identifier + job.working_string[matchend:]
+    print job.working_string
 def translator(line):
     pass
 
 def main():
-    line = "data=\"foo.txt\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
+    line = "data=\"foo.txt\" \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
     scanner(line)
 
 if __name__ == "__main__":
     main()
+
+# useful regex
+# a = "fjdsklajsearchfdajk"
+# for i in re.finditer("search",a):
+#     print i.start(), i.end()
 
 # First draft idea, keeping for regex reference:
 # # Breaks apart the line into expressions which can be evaluated.
