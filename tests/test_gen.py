@@ -1,10 +1,18 @@
 #!/usr/bin/env python
 from __future__ import division
+
+print "***********************************************************************"
+print "autoplot.py must be in PYTHONPATH, run with:"
+print "\"PYTHONPATH=/path/to/autoplot ./test_gen.py\" or move autoplot to a"
+print "directory in PYTHONPATH, otherwise this program will fail to run"
+print "***********************************************************************"
+
 import numpy as np
 import glob
 import os
 import sys
 import random
+import autoplot
 
 if "-clean" in sys.argv:
     print "Deleting existing dataset_n tests."
@@ -43,3 +51,8 @@ for i in range(num_existing_tests,num_tests+num_existing_tests):
             data_file.write("%f %f\n"%(t[i], f[i]))
     with open("%s/autoplotlist.txt"%path,"w+") as autoplot_file:
         autoplot_file.write("data=\"test_data_%d.CSV\" title=\"Fourier expansion of a square wave, first %d terms.\" xlabel=\"t\" ylabel=\"f_%d(t)\""%(m,m,m))
+    old_pwd = os.getcwd()
+    os.chdir(path)
+    aplot = autoplot.Autoplot("autoplotlist.txt")
+    aplot.processJobs()
+    os.chdir(old_pwd)
