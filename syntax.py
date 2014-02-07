@@ -141,13 +141,16 @@ def scanner(line):
         match_start = terminal.start()
         match_end = terminal.end()
         job.working_string = job.working_string[:match_start] + token + job.working_string[match_end:]
-    debug(job.working_string)        
+    debug(job.working_string)
+
+    debug("At this point, everything on the job line should be parsed into assignment=@!APID!@ form.")
+    debug("If not, the syntax is invalid. (there are only flags and assignments, and those were taken care of.)")
 
 def translator(line):
     pass
 
 def main():
-    line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] -flag \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"] -animate -dog_flag"
+    line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] -flag theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"] -animate -dog_flag"
     scanner(line)
 
 if __name__ == "__main__":
