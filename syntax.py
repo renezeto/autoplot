@@ -35,44 +35,56 @@ import re
 """
 
 
-class Token():
-    self.assignment = None
-    self.listblock = None
-    self.terminal = None
-    self.strblock = None
-    def __init__(self, token_type):
-        
+class Job():
+    command_list = None #list of assignment=value
 
-# Breaks apart the line into expressions which can be evaluated.
+    assignment = None
+    listblock = None
+    terminal = None
+    strblock = []
+
+    token_counter = 0
+
+    def __init__(self, line):
+        self.original_string = line
+        self.working_string = [line]
+        self.list_index = list(enumerate(line))
+
+    def token(value,token_type):
+        identifier = "@!APID:%05d!@"%token_counter
+        token_counter += 1
+        return identifier
+
 def scanner(line):
-    # Parse out EOL comments
-    if ("#" in line): line = re.findall("^(.*?)(?=\s#|#)",line)[0]
-    # Find flags
-    flag_container = re.findall("-[\w]+",line)
-    # Find string valued kwargs
-    quote_kwarg_container = re.findall("([\w.]+=\"[^\"]*\")",line)
-    # Find list valued kwargs
-    group_kwarg_container = re.findall("\w+=\[[\w,\^*+-/! ()]+\]",line)
-    # Find alphanumeric valued kwargs
-    kwarg_container = re.findall("\w+=\w+",line)
-    # Append to list for evaluater.
-    return flag_container + quote_kwarg_container + group_kwarg_container + kwarg_container
+    job = Job(line)
+    #find all stringblocks
+    stringblocks = re.findall("\"(.*?)\"",line)
+    for stringblock in stringblocks:
+        for substring in working_string:
+            substring = substring.replace(stringblock,job.token(stringblock))
 
 def translator(line):
-    # Evaluates the expressions from scanner and returns the necessary information
-    # to autoplot.
     pass
 
 def main():
-    line = "data=\"foo.txt\" theory=\"[x^2, x^3]\" legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
+    line = "data=\"foo.txt\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
     scanner(line)
 
 if __name__ == "__main__":
     main()
 
-
-# look for things in quotes. find the first quote, find the second, capture that object.
-# # replace object with more parseable "pointer" to real object.
-# look for things in brackets. find the first bracket, find the second. capture that object.
-# # replace the object with the pointer to the bracket object, which could contain pointers to other objects.
-# look for key=value pairs. store those as pointers too.
+# First draft idea, keeping for regex reference:
+# # Breaks apart the line into expressions which can be evaluated.
+# def scanner(line):
+#     # Parse out EOL comments
+#     if ("#" in line): line = re.findall("^(.*?)(?=\s#|#)",line)[0]
+#     # Find flags
+#     flag_container = re.findall("-[\w]+",line)
+#     # Find string valued kwargs
+#     quote_kwarg_container = re.findall("([\w.]+=\"[^\"]*\")",line)
+#     # Find list valued kwargs
+#     group_kwarg_container = re.findall("\w+=\[[\w,\^*+-/! ()]+\]",line)
+#     # Find alphanumeric valued kwargs
+#     kwarg_container = re.findall("\w+=\w+",line)
+#     # Append to list for evaluater.
+#     return flag_container + quote_kwarg_container + group_kwarg_container + kwarg_container
