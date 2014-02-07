@@ -70,14 +70,25 @@ class Job():
 
 def scanner(line):
     job = Job(line)
+
+    print "Debugging messages! Read these if you want to understand how scanner processes job strings."
+    print "Initial string, hot off the jobfile...:"
     print job.working_string
+    print "Now, we find all of the stringblocks, catalog them, and replace the stringblock in the job string with a token:"
+    # Identify stringblocks
     while re.search("\"(.*?)\"",job.working_string) is not None:
         stringblock = re.search("\"(.*?)\"",job.working_string)
-        identifier = job.add_token(stringblock.group(0), 0)
+        token = job.add_token(stringblock.group(0), 0)
         matchstart = stringblock.start()
         matchend = stringblock.end()
-        job.working_string = job.working_string[:matchstart] + identifier + job.working_string[matchend:]
+        job.working_string = job.working_string[:matchstart] + token + job.working_string[matchend:]
     print job.working_string
+    print "Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:"
+
+
+    # Identify terminal expressions (everything left that isn't a listblock)
+    #while re.search
+
 def translator(line):
     pass
 
