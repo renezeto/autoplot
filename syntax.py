@@ -29,7 +29,7 @@ class Job():
     def __init__(self, line):
         self.command_list = None #list of assignment=value
 
-        self.assignment = None
+        self.assignment = {}
 
         # Hash tables for stringblock, terminal, and listblock token types.
         self.stringblock_catalog = {}
@@ -64,8 +64,6 @@ def debug(msg):
 
 
 # parse stringblocks -> parse the contents of listblocks -> parse listblocks -> parse everything else
-
-
 def scanner(line):
     job = Job(line)
 
@@ -145,6 +143,17 @@ def scanner(line):
 
     debug("At this point, everything on the job line should be parsed into assignment=@!APID!@ form.")
     debug("If not, the syntax is invalid. (there are only flags and assignments, and those were taken care of.)")
+
+    debug("Finally, split up the kwargs and stick em in a dictionary.")
+    kwargs = job.working_string.split(" ")
+    for key_value_pair in kwargs:
+        key, value = (key_value_pair.split("=")[0], key_value_pair.split("=")[1])
+        debug("%s, %s"%(key, value))
+        job.assignment[key]=value
+    debug("Returns:")
+    debug(job.assignment)
+
+    return job.assignment
 
 def translator(line):
     pass
