@@ -20,14 +20,6 @@ import re
 
  No listblock nesting! it's unnecessary and regex can't handle it.
 
- Scanner outline:
-
- 1. Take string, place in "container" list.
- 2. Regex on string looking for stringblocks. Replace those with stringblock objects.
- 3. Regex on string looking for terminals. Replace those with terminal objects. At this point,
-    we will have captured everything that is not a listblock. 
- 4. Listblocks
-
  Assignments are the topmost level. Flags are assignments with the terminal value of one.
 """
 
@@ -76,8 +68,6 @@ def debug(msg):
 
 def scanner(line):
     job = Job(line)
-
-
 
     debug("Debugging messages! Read these if you want to understand how scanner processes job strings.")
     debug("Initial string, hot off the jobfile...:")
@@ -135,11 +125,29 @@ def scanner(line):
         job.working_string = job.working_string[:lb_match_start] + lb_token + job.working_string[lb_match_end:]
         debug(job.working_string)
 
+    debug("Parse flags into assignment form.")
+    while re.search("-\w+(?!=)",job.working_string) is not None:
+        flag = re.search("-\w+(?!=)",job.working_string)
+        match_start = flag.start()
+        match_end = flag.end()
+        replacement = flag.group(0)[1:] + "=1"
+        job.working_string = job.working_string[:match_start] + replacement + job.working_string[match_end:]
+    debug(job.working_string)
+
+    debug("Remove terminal expressions that aren't in listblocks.")
+    while re.search("(?<==)(?<!@)\w+(?!@)",job.working_string) is not None:
+        terminal = re.search("(?<==)(?<!@)\w+(?!@)",job.working_string)
+        token = job.add_token(terminal.group(0), 1)
+        match_start = terminal.start()
+        match_end = terminal.end()
+        job.working_string = job.working_string[:match_start] + token + job.working_string[match_end:]
+    debug(job.working_string)        
+
 def translator(line):
     pass
 
 def main():
-    line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
+    line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] -flag \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"] -animate -dog_flag"
     scanner(line)
 
 if __name__ == "__main__":
