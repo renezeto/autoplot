@@ -81,6 +81,8 @@ def debug(msg):
 def scanner(line):
     job = Job(line)
 
+
+
     debug("Debugging messages! Read these if you want to understand how scanner processes job strings.")
     debug("Initial string, hot off the jobfile...:")
     debug(job.working_string)
@@ -96,15 +98,19 @@ def scanner(line):
     debug(job.working_string)
     debug("Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:")
 
-
+    # regex brainstorm
     # Identify terminal expressions (everything left that isn't a listblock)
-    #while re.search
+    #print (re.search("(?<==)(?!@!APID:[0-9]{8}!@).+",job.working_string)).group(0)
+
+    #print (re.search("(?<==)[\[\]()*+-=!@#.;\w]+(?= )",job.working_string)).group(0)
+    #print (re.search("[^\[]*(\[.*\])[^\]]*",job.working_string)).group(0)
+    # (?<==)
 
 def translator(line):
     pass
 
 def main():
-    line = "data=\"foo.txt\" \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
+    line = "data=\"foo.txt\" listoflists=[sin(x), [cos(x), \"red\", 5]] \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
     scanner(line)
 
 if __name__ == "__main__":
