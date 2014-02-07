@@ -1,0 +1,6 @@
+Informal bug tracker. I don't have experience implementing a real one, so for now, this will have to do.
+
+- Autoplot won't handle jobs w/o a data kwarg. This means no making plots of mathematical functions.  
+
+- Syntax issue: datafile parsing is too restrictive. Lines with alphabet characters get parsed out. This is bad because
+some scopes write data in the form "+3.00E-4"; the E causes it to get ignored.

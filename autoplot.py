@@ -8,6 +8,7 @@ import sys
 import os
 import glob
 import re
+import subprocess
 
 #
 # DO NOT MERGE THIS FILE!
@@ -104,12 +105,14 @@ class Autoplot():
                             numJobs += 1
                 else:
                     # Probably a blank line, or unspecified data (can't make a plot out of this)
+                    # RZ: There are cases where we wouldn't specify data. e.g. plotting mathematical functions. 
                     continue
         self.numJobs = numJobs 
         self.plots = plots
         
     ## Deleted countJobs(), job done by __init__() now (jwo)
-        
+
+    # RZ: Soon to be obsolete.
     def _setKWArgs(self, line):
         """Private method. Given a line from an autoplot job file, return a dictionary containing its parameters."""
         # Return commands dictionary with entries read from line in jobFile and the defaults
@@ -136,6 +139,7 @@ class Autoplot():
         """Process the plots created when the Autoplot object was initialized."""
     # Process each Plot one at a time
     ## This logic should be enhanced later (e.g,. by processing plots in parallel).
+    # RZ: Handle parallel processing here.
         for plot in self.plots:
             plot.loadData()
             plot.plotData()
@@ -159,6 +163,7 @@ class Plot():
         # this is because the CSV might have multiple columns, not just two. plotData then plots them on the same plot. (might want to change that later)
         dataContainer = []
         numEntries = 0
+        # RZ: Will modify this for plots with no data import later.
         fileLoc = self.commands['data']
         with open(fileLoc) as dataFile: ## This will crash on missing fileLoc
             iterNum = 0
@@ -183,6 +188,7 @@ class Plot():
         return dataContainer
 
     ## TODO: learn how matplotlib works (jwo)
+    # RZ: Will get rid of all evals soon enough. Syntax should handle that.
     def plotData(self):
         """Generate plot of data loaded from a datafile. Output to PNG image with the same name."""
         if self.dataContainer is None:
