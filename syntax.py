@@ -1,6 +1,11 @@
+import sys
 import re
 
-"""  VOCAB (list of expressions)
+"""  
+ Important! Run with -debug to see helpful messages. Code is much easier to learn with those on.
+
+ VOCAB (list of expressions):
+
  terminal: a terminating expression that is not a string (e.g. x^2).
  stringblock: a string.
  listblock: a list of values.
@@ -68,13 +73,19 @@ class Job():
         self.token_counter += 1
         return identifier
 
+def debug(msg):
+    if "-debug" in sys.argv:
+        print msg
+    return 0
+
 def scanner(line):
     job = Job(line)
 
-    print "Debugging messages! Read these if you want to understand how scanner processes job strings."
-    print "Initial string, hot off the jobfile...:"
-    print job.working_string
-    print "Now, we find all of the stringblocks, catalog them, and replace the stringblock in the job string with a token:"
+    debug("Debugging messages! Read these if you want to understand how scanner processes job strings.")
+    debug("Initial string, hot off the jobfile...:")
+    debug(job.working_string)
+    debug("Now, we find all of the stringblocks, catalog them, and replace the stringblock in the job string with a token:")
+
     # Identify stringblocks
     while re.search("\"(.*?)\"",job.working_string) is not None:
         stringblock = re.search("\"(.*?)\"",job.working_string)
@@ -82,8 +93,8 @@ def scanner(line):
         matchstart = stringblock.start()
         matchend = stringblock.end()
         job.working_string = job.working_string[:matchstart] + token + job.working_string[matchend:]
-    print job.working_string
-    print "Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:"
+    debug(job.working_string)
+    debug("Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:")
 
 
     # Identify terminal expressions (everything left that isn't a listblock)
