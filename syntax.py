@@ -80,7 +80,7 @@ def scanner(line):
         match_end = stringblock.end()
         job.working_string = job.working_string[:match_start] + token + job.working_string[match_end:]
     debug(job.working_string)
-    debug("Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:")
+    debug("Next, we find all of the listblocks, and their contents.")
 
     # Identify listblocks
     while re.search("\[[^\[\]]*\]",job.working_string) is not None:
