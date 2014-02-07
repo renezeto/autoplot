@@ -17,15 +17,8 @@ import re
  * terminal
  * stringblock
  * listblock 
- * * terminal
- * * stringblock
- * * listblock
- * * * terminal
- * * * stringblock
- * * * listblock
- ...
 
- Get the idea? 
+ No listblock nesting! it's unnecessary and regex can't handle it.
 
  Scanner outline:
 
@@ -33,8 +26,7 @@ import re
  2. Regex on string looking for stringblocks. Replace those with stringblock objects.
  3. Regex on string looking for terminals. Replace those with terminal objects. At this point,
     we will have captured everything that is not a listblock. 
- 4. Regex on string looking for all listblocks (in order of most deeply nested first).
-    Replace those with listblock objects (which contain references to the nested values inside).
+ 4. Listblocks
 
  Assignments are the topmost level. Flags are assignments with the terminal value of one.
 """
@@ -78,6 +70,10 @@ def debug(msg):
         print msg
     return 0
 
+
+# parse stringblocks -> parse the contents of listblocks -> parse listblocks -> parse everything else
+
+
 def scanner(line):
     job = Job(line)
 
@@ -92,25 +88,58 @@ def scanner(line):
     while re.search("\"(.*?)\"",job.working_string) is not None:
         stringblock = re.search("\"(.*?)\"",job.working_string)
         token = job.add_token(stringblock.group(0), 0)
-        matchstart = stringblock.start()
-        matchend = stringblock.end()
-        job.working_string = job.working_string[:matchstart] + token + job.working_string[matchend:]
+        match_start = stringblock.start()
+        match_end = stringblock.end()
+        job.working_string = job.working_string[:match_start] + token + job.working_string[match_end:]
     debug(job.working_string)
     debug("Next, we find all of the terminal expressions, which can be found by looking for things that aren't tokens or listblocks:")
 
-    # regex brainstorm
-    # Identify terminal expressions (everything left that isn't a listblock)
-    #print (re.search("(?<==)(?!@!APID:[0-9]{8}!@).+",job.working_string)).group(0)
+    # Identify listblocks
+    while re.search("\[[^\[\]]*\]",job.working_string) is not None:
+        listblock = re.search("\[[^\[\]]*\]",job.working_string)
+        lb_match_start = listblock.start()
+        lb_match_end = listblock.end()
 
-    #print (re.search("(?<==)[\[\]()*+-=!@#.;\w]+(?= )",job.working_string)).group(0)
-    #print (re.search("[^\[]*(\[.*\])[^\]]*",job.working_string)).group(0)
-    # (?<==)
+        working_listblock = listblock.group(0)
+
+        # Identify listblock elements that aren't already parsed (these must be terminal expressions)
+        debug("Remove element at start of listblock.")
+        while re.search("(?<=\[)[^\[\]\s@]+(?=,)",working_listblock) is not None:
+            terminal = re.search("(?<=\[)[^\[\]\s@]+(?=,)",working_listblock)
+            token = job.add_token(terminal.group(0), 1)
+            match_start = terminal.start()
+            match_end = terminal.end()
+            working_listblock = working_listblock[:match_start] + token + working_listblock[match_end:]
+        debug(working_listblock)
+
+        debug("Remove elements in middle of listblock.")
+        while re.search("(?<=, )[^\[\]\s@]+(?=,)",working_listblock) is not None:
+            terminal = re.search("(?<=, )[^\[\]\s@]+(?=,)",working_listblock)
+            token = job.add_token(terminal.group(0), 1)
+            match_start = terminal.start()
+            match_end = terminal.end()
+            working_listblock = working_listblock[:match_start] + token + working_listblock[match_end:]
+        debug(working_listblock)
+
+        debug("Remove element at end of listblock.")
+        while re.search("(?<=, )[^\[\]\s@]+(?=\])",working_listblock) is not None:
+            terminal = re.search("(?<=, )[^\[\]\s@]+(?=\])",working_listblock)
+            token = job.add_token(terminal.group(0), 1)
+            match_start = terminal.start()
+            match_end = terminal.end()
+            working_listblock = working_listblock[:match_start] + token + working_listblock[match_end:]
+        debug(working_listblock)
+
+        debug("Remove listblock (which now contains references to other tokens.)")
+        lb_token = job.add_token(working_listblock, 2)
+        job.working_string = job.working_string[:lb_match_start] + lb_token + job.working_string[lb_match_end:]
+        debug(job.working_string)
 
 def translator(line):
     pass
 
 def main():
-    line = "data=\"foo.txt\" listoflists=[sin(x), [cos(x), \"red\", 5]] \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
+    line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] \"yes\" \"yes\" theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"]"
     scanner(line)
 
 if __name__ == "__main__":
