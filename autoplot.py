@@ -10,11 +10,9 @@ import glob
 import re
 import subprocess
 
-#
-# DO NOT MERGE THIS FILE!
-# The implimentation here is EXPERIMENTAL and INCOMPLETE
-# While nothing is expected to break until I make it break, it is safer to
-# keep this out of the deployable branch.
+# RZ: Justin; update this? not sure what comments are current. Also, I have merged into branch master, since this code works,
+# and I have created a new release branch called v0.1 for the old one. For each big update, I'll just create a new branch point and 
+# freeze it.
 
 # Justin O'Neil: commenting code, reimplimenting program logic to use OOP
 # Suggestions/TODO:
@@ -187,28 +185,41 @@ class Plot():
         self.dataContainer = dataContainer
         return dataContainer
 
-    ## TODO: learn how matplotlib works (jwo)
-    # RZ: Will get rid of all evals soon enough. Syntax should handle that.
+    # So this function will need a big rewrite. It's not very modular and we can do better now.
     def plotData(self):
         """Generate plot of data loaded from a datafile. Output to PNG image with the same name."""
         if self.dataContainer is None:
             # Somebody fucked up. Refuse to run this.
             raise Exception
+        # Always line. This will be handled better in the new function. 
         plotType = self.commands["plot_type"]
+        # Basically code injection from the autoplotlist file, to customize the look of the figure
+        # this is read into the plot function as **plotCLKwargs
         plotCLKwargs = eval(self.commands["plot_kwargs"])
+        # Check if we are doing a line plot. spoiler: we are
         if plotType=="line":
+            # Get figure aspect ratio
             w, h = plt.figaspect(self.commands['aspect'])
+            # Creates figure, puts 1x1 subplot on it. Never got around to making it support more. 
+            # figsize is about the aspect ratio
             fig, axs = plt.subplots(1, 1,figsize=(w,h))
+            # Get the file name (remove the extension)
             fname = self.commands['data'][:-4]
+            # xData tells us which dataset is the horizontal axis (1st column of csv, 2nd column, 3rd column? etc)
+            # all the others are plotted on the vertical axis together
             xData = self.dataContainer[self.commands["x_data"]]
             self.dataContainer.pop(self.commands["x_data"])
             for dataSet in self.dataContainer:
                 axs.plot(xData,dataSet,**plotCLKwargs)
+            # Plot one theory curve if specified, with the same resolution as the data set. Not ideal.
             if self.commands["theory"] is not None:
                 expression=self.commands["theory"]
                 x = np.array([float(i) for i in xData])
                 curve = eval(expression)
                 axs.plot(xData,curve,**plotCLKwargs)
+            # Set axis scale. linear, logarithmic, etc. the **eval stuff is for scale-specific kwargs
+            # (e.g. ok, you want a log plot. what base?) these are documented in matplotlib and 
+            # again not ideal, since we are injecting code
             axs.set_xscale(self.commands['xscale'],**eval(self.commands['xscale_kwargs']))
             axs.set_yscale(self.commands['yscale'],**eval(self.commands['yscale_kwargs']))
             plt.xlabel(self.commands['xlabel'],fontsize=self.commands['labelsize'])
@@ -224,8 +235,10 @@ class Plot():
                 x1, x2 = eval(self.commands['xrange'])
             if self.commands['yrange'] is not None:
                 y1, y2 = eval(self.commands['yrange'])
+            # plot range limits
             plt.xlim([x1,x2])
             plt.ylim([y1,y2])
+            # trim whitespace
             plt.tight_layout()
             plt.savefig("%s"%fname)
         return 0
