@@ -1,4 +1,4 @@
-Autoplot
+Autoplot v0.1 (old, stable)
 ========
 Autoplot is a small python program for efficiently creating report quality plots from instrument data. It allows for easier access to matplotlib callss, while keeping a faster workflow by avoiding using a GUI. Instead of a GUI, Autoplot uses a config/jobs file, which it will read and process to generate the desired plots. An example is given below:
 
@@ -7,4 +7,4 @@ Autoplot is a small python program for efficiently creating report quality plots
     
     data="resistance_data/ohmtest.CSV" xlabel="Voltage (V)" ylabel="Current (A)" title="Testing Ohm's law for a 5 kOhm carbon film resistor." theory="x/5000"
     
-This kind of job file will use matplotlib to produce 3 plots as presented below: [readme wip]
+
