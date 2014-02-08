@@ -1,0 +1,3 @@
+things to consider-
+* recompile only changed figures
+* data formatting module (process raw data)
