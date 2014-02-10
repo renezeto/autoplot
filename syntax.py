@@ -37,8 +37,8 @@ class Job():
         self.listblock_catalog = {}
 
         # If we are ever unsure of what type an identifier is, check its first index
-        # value in type_container.
-        self.type_container = [self.stringblock_catalog, self.terminal_catalog, self.listblock_catalog]
+        # value in type_container. Doesn't need to be updated when the dicts update.
+        self.reference = [self.stringblock_catalog, self.terminal_catalog, self.listblock_catalog]
 
         self.original_string = line
         self.working_string = line
@@ -48,13 +48,13 @@ class Job():
 
     def add_token(self,value,token_type):
         identifier = "@!APID:%08d!@"%self.token_counter
+        self.token_counter += 1
         if token_type == 0:
             self.stringblock_catalog[identifier] = value
         if token_type == 1:
             self.terminal_catalog[identifier] = value
         if token_type == 2:
             self.listblock_catalog[identifier] = value
-        self.token_counter += 1
         return identifier
 
 def debug(msg):
@@ -62,9 +62,9 @@ def debug(msg):
         print msg
     return 0
 
-
 # parse stringblocks -> parse the contents of listblocks -> parse listblocks -> parse everything else
 def scanner(line):
+    # string -> dict
     job = Job(line)
 
     debug("Debugging messages! Read these if you want to understand how scanner processes job strings.")
@@ -152,36 +152,28 @@ def scanner(line):
         job.assignment[key]=value
     debug("Returns:")
     debug(job.assignment)
+    return job
 
-    return job.assignment
+def retrieve(search_param, job):
+    token = job.assignment[search_param]
+    if re.match("@!APID:[0-9]{8}!@", token) is not None:
+        search_param = re.match("@!APID:[0-9]{8}!@",token).group(0)
+        print search_param
+#        retrieve(search_param, job)
 
-def translator(line):
-    pass
+#    print "here"
+#    print token
+    #if re.match("@!APID:[0-9]{8}!@", token) is not None:
+    for identifier in re.findall("@!APID:[0-9]{8}!@", token):
+        for sub_identifier in re.findall("@!APID:[0-9]{8}!@", identifier):
+            print identifier, sub_idenitifier
+    # for token in re.findall("@!APID:[0-9]{8}!@",entry):
+        
+    # return job.reference[block_type][search_param]
 
 def main():
     line = "data=\"foo.txt\" listoflists=[sin(x), cos(x)] -flag theory=[x^2, x^3] legend=[\"scientific foo data\", \"parabola!\", \"cube-ol-a?\"] labelsize=20 ticksize=10 numticks=5 colors=[\"r\", \"b\", \"g\"] -animate -dog_flag"
-    scanner(line)
-
+    job = scanner(line)
+    retrieve("listoflists", job)
 if __name__ == "__main__":
     main()
-
-# useful regex
-# a = "fjdsklajsearchfdajk"
-# for i in re.finditer("search",a):
-#     print i.start(), i.end()
-
-# First draft idea, keeping for regex reference:
-# # Breaks apart the line into expressions which can be evaluated.
-# def scanner(line):
-#     # Parse out EOL comments
-#     if ("#" in line): line = re.findall("^(.*?)(?=\s#|#)",line)[0]
-#     # Find flags
-#     flag_container = re.findall("-[\w]+",line)
-#     # Find string valued kwargs
-#     quote_kwarg_container = re.findall("([\w.]+=\"[^\"]*\")",line)
-#     # Find list valued kwargs
-#     group_kwarg_container = re.findall("\w+=\[[\w,\^*+-/! ()]+\]",line)
-#     # Find alphanumeric valued kwargs
-#     kwarg_container = re.findall("\w+=\w+",line)
-#     # Append to list for evaluater.
-#     return flag_container + quote_kwarg_container + group_kwarg_container + kwarg_container
