@@ -1,1 +1,1 @@
-#this script will be an installer for stable releases of autoplot
+cp autoplot.py /usr/local/bin/autoplot
